@@ -133,11 +133,11 @@ extern "C" {
 		uint16_t mole_xpos : 5;
 		uint16_t mole_scale : 4;
 		uint16_t mole_enabled : 1;
+		char16_t creator_name[10];
 	} FFLiMiiDataCore;
 
 	typedef struct FFLiMiiDataOfficial {
 		FFLiMiiDataCore core;
-		char16_t creator_name[10];
 	} FFLiMiiDataOfficial;
 
 	typedef struct FFLStoreData {
@@ -151,10 +151,8 @@ union MiiFile {
 } mf;
 
 typedef struct MiiDB {
-
 	int8_t header[9];
 	std::array<FFLStoreData, 4> data;
-
 } MiiDatabase;
 
 union MiiDBFile {
