@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <cstdint>
+#include <vector>
 #include "wut_structsize.h"
 
 #ifdef __cplusplus
@@ -9,30 +10,23 @@ extern "C" {
 
 #pragma pack(push, 1)
 
-	enum FFLCreateIDFlags : uint8_t
-	{
-		IsWiiUMii = 0x1 | 0x4,
-		IsTemporaryMii = 0x2,
-		IsNormalMii = 0x8,
-	};
+	typedef enum FFLCreateIDFlags {
+		FFL_CREATE_ID_FLAG_WII_U = 0x1 | 0x4,
+		FFL_CREATE_ID_FLAG_TEMPORARY = 0x2,
+		FFL_CREATE_ID_FLAG_NORMAL = 0x8,
+	} FFLCreateIDFlags;
 
-	struct FFLCreateID
-	{
-		uint32_t flags : 4;
+	typedef struct FFLCreateID {
+		FFLCreateIDFlags flags : 4;
 
-		//! Seconds since Jan 1st 2010
 		uint32_t timestamp : 28;
 
 		uint8_t deviceHash[6];
-	};
-	WUT_CHECK_OFFSET(FFLCreateID, 4, deviceHash);
-	WUT_CHECK_SIZE(FFLCreateID, 10);
+	} FFLCreateID;
 
-	// This structure is intentionally little-endian as the data
-	//  is stored in a cross-platform manner for multiple devices.
-	struct FFLiMiiDataCore
+	//Note: the endian may be wrong here
+	typedef struct FFLiMiiDataCore
 	{
-		// 0x00
 		uint8_t birth_platform : 4;
 		uint8_t unk_0x00_b4 : 4;
 
@@ -67,7 +61,7 @@ extern "C" {
 		uint16_t gender : 1;
 
 		// 0x1A
-		char16_t mii_name[10];
+		uint16_t mii_name[10];
 
 		// 0x2E
 		uint8_t size;
@@ -139,32 +133,16 @@ extern "C" {
 		uint16_t mole_xpos : 5;
 		uint16_t mole_scale : 4;
 		uint16_t mole_enabled : 1;
-	};
-	WUT_CHECK_OFFSET(FFLiMiiDataCore, 0x03, mii_version);
-	WUT_CHECK_OFFSET(FFLiMiiDataCore, 0x04, author_id);
-	WUT_CHECK_OFFSET(FFLiMiiDataCore, 0x0C, mii_id);
-	WUT_CHECK_OFFSET(FFLiMiiDataCore, 0x16, unk_0x16);
-	WUT_CHECK_OFFSET(FFLiMiiDataCore, 0x1A, mii_name);
-	WUT_CHECK_OFFSET(FFLiMiiDataCore, 0x2E, size);
-	WUT_CHECK_OFFSET(FFLiMiiDataCore, 0x2F, fatness);
-	WUT_CHECK_OFFSET(FFLiMiiDataCore, 0x33, hair_type);
-	WUT_CHECK_SIZE(FFLiMiiDataCore, 0x48);
+	} FFLiMiiDataCore;
 
-	struct FFLiMiiDataOfficial : FFLiMiiDataCore
-	{
+	typedef struct FFLiMiiDataOfficial {
+		FFLiMiiDataCore core;
 		char16_t creator_name[10];
-	};
-	WUT_CHECK_OFFSET(FFLiMiiDataOfficial, 0x48, creator_name);
-	WUT_CHECK_SIZE(FFLiMiiDataOfficial, 0x5C);
+	} FFLiMiiDataOfficial;
 
-	struct FFLStoreData : FFLiMiiDataOfficial
-	{
-		uint16_t unk_0x5C;
-		uint16_t checksum;
-	};
-	WUT_CHECK_OFFSET(FFLStoreData, 0x5C, unk_0x5C);
-	WUT_CHECK_OFFSET(FFLStoreData, 0x5E, checksum);
-	WUT_CHECK_SIZE(FFLStoreData, 0x60);
+	typedef struct FFLStoreData {
+		FFLiMiiDataOfficial data;
+	} FFLStoreData;
 
 
 union MiiFile {
@@ -174,7 +152,8 @@ union MiiFile {
 
 typedef struct MiiDB {
 
-	char header[8];
+	int8_t header[9];
+	std::array<FFLStoreData, 4> data;
 
 } MiiDatabase;
 
