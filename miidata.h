@@ -61,7 +61,7 @@ extern "C" {
 		uint16_t gender : 1;
 
 		// 0x1A
-		uint16_t mii_name[10];
+		char16_t mii_name[10];
 
 		// 0x2E
 		uint8_t size;

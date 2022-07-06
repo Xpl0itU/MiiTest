@@ -37,4 +37,4 @@
 #define WUT_ALIGNAS(x) alignas(x)
 #elif defined(__GNUC__) || defined(__clang__)
 #define WUT_ALIGNAS(x) __attribute__((__aligned__(x)))
-#endif#pragma once
+#endif

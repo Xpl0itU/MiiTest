@@ -2,6 +2,8 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <locale>
+#include <codecvt>
 
 using namespace std;
 
@@ -13,4 +15,14 @@ auto string_format(const string& format, Args... args) -> string {
 	unique_ptr<char[]> buf(new char[size]);
 	snprintf(buf.get(), size, format.c_str(), args...);
 	return string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
+}
+
+std::string utf16_to_utf8(std::u16string const& s)
+{
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t, 0x10ffff,
+        std::codecvt_mode::little_endian>, char16_t> cnv;
+    std::string utf8 = cnv.to_bytes(s);
+    if(cnv.converted() < s.size())
+        throw std::runtime_error("incomplete conversion");
+    return utf8;
 }
