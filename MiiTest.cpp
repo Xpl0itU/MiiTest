@@ -44,12 +44,13 @@ void loadDBandWrite(MiiDBFile& f, const std::string& s, const std::string& out)
     input.read(db.mem, sizeof(MiiDatabase));
 
     wprintf(L"Header: %s\n", db.database.header);
+    std::string name;
     
     for (const auto& arr : db.database.data) {
         wprintf(L"Mii name: %s\n", utf16_to_utf8(std::u16string(arr.data.core.mii_name)).c_str());
-        std::string name(string_format("%s", utf16_to_utf8(std::u16string(arr.data.core.mii_name)).c_str()));
-        if(name.compare(string_format("%s", out))) {
-            fwrite(&arr.data.core, sizeof(arr.data.core), 1, outfile);
+        name = string_format("%s", utf16_to_utf8(std::u16string(arr.data.core.mii_name)).c_str());
+        if(name == out) {
+            fwrite(&arr.data.core, sizeof(FFLStoreData), 1, outfile);
         }
     }
     fclose(outfile);
